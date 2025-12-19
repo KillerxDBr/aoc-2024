@@ -67,8 +67,8 @@ fn main() {
     let mut lhs: Vec<u64> = Vec::new();
     let mut rhs: Vec<u64> = Vec::new();
 
-    for line in content.trim().split('\n') {
-        // println!("Line: {}", line);
+    for line in content.lines() {
+        // println!("Line: \"{}\"", line);
         let mut c = line.split_ascii_whitespace();
         lhs.push(c.next().unwrap().parse().unwrap());
         rhs.push(c.next().unwrap().parse().unwrap());
