@@ -45,17 +45,17 @@ fn part1(reports: &Vec<Vec<u64>>) -> u64 {
     return result;
 }
 
-fn part2(reports: &Vec<Vec<u64>>) -> u64 {
-    let mut result: u64 = 0;
+fn part2(_reports: &Vec<Vec<u64>>) -> u64 {
+    let mut _result: u64 = 0;
 
     //
 
-    return result;
+    return _result;
 }
 
 fn main() {
     let content = load_data().unwrap();
-    let lines: Vec<_> = content.lines().collect();
+    let lines: Vec<&str> = content.lines().collect();
 
     let mut reports: Vec<Vec<u64>> = Vec::with_capacity(lines.len());
     for line in lines {
@@ -64,15 +64,7 @@ fn main() {
             report.push(v.parse::<u64>().unwrap());
         }
         reports.push(report);
-        // println!("'{}'", line);
     }
-
-    // for r in &reports {
-    //     for v in r {
-    //         print!("{} ", v);
-    //     }
-    //     print!("\n");
-    // }
 
     println!("Resultado Parte 1: {}", part1(&reports));
     println!("Resultado Parte 2: {}", part2(&reports));
