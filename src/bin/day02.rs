@@ -45,12 +45,76 @@ fn part1(reports: &Vec<Vec<u64>>) -> u64 {
     return result;
 }
 
-fn part2(_reports: &Vec<Vec<u64>>) -> u64 {
-    let mut _result: u64 = 0;
+fn part2(reports: &Vec<Vec<u64>>) -> u64 {
+    let mut result: u64 = 0;
 
-    //
+    for report in reports {
+        let report_count = report.len();
 
-    return _result;
+        let mut safe: bool = true;
+        let mut again: bool = false;
+        let mut new_report = report.clone();
+
+        println!("=================================================");
+        println!("Testing Report: {report:?}");
+        let ord = new_report[0] as i64 - new_report[1] as i64;
+        for i in 1..report_count {
+            // diffs.push(report[i] as i64 - report[i - 1] as i64);
+            let diff: i64 = new_report[i - 1] as i64 - new_report[i] as i64;
+            println!(
+                "abs({} - {}) = {}",
+                new_report[i - 1],
+                new_report[i],
+                diff.abs()
+            );
+            if diff.abs() == 0 || diff.abs() > 3 || (ord < 0 && diff > 0) || (ord > 0 && diff < 0) {
+                println!("ord: {ord}");
+                println!("diff: {diff}");
+                println!("diff.abs() == 0: {}", diff.abs() == 0);
+                println!("diff.abs() > 3: {}", diff.abs() > 3);
+                println!("ord < 0 && diff > 0: {}", (ord < 0 && diff > 0));
+                println!("ord > 0 && diff < 0: {}", (ord > 0 && diff < 0));
+
+                let index_to_remove: usize;
+                if diff.abs() == 0 || ord < 0 {
+                    index_to_remove = i - 1;
+                } else {
+                    index_to_remove = i;
+                }
+                println!(
+                    "Removing report {} ({})",
+                    index_to_remove, new_report[index_to_remove]
+                );
+                new_report.remove(index_to_remove);
+                again = true;
+                break;
+            }
+        }
+
+        if again {
+            println!("Testing Again");
+            let ord = new_report[0] as i64 - new_report[1] as i64;
+            for i in 1..new_report.len() {
+                let diff: i64 = new_report[i - 1] as i64 - new_report[i] as i64;
+                let u_diff = diff.abs() as u64;
+                println!("abs({} - {}) = {u_diff}", new_report[i - 1], new_report[i]);
+                if u_diff == 0 || u_diff > 3 || (ord < 0 && diff > 0) || (ord > 0 && diff < 0) {
+                    println!("diff.abs() == 0: {}", diff.abs() == 0);
+                    println!("diff.abs() > 3: {}", diff.abs() > 3);
+                    println!("ord < 0 && diff > 0: {}", (ord < 0 && diff > 0));
+                    println!("ord > 0 && diff < 0: {}", (ord > 0 && diff < 0));
+                    println!("Report {report:?} is NOT safe");
+                    safe = false;
+                    break;
+                }
+            }
+        }
+        if safe {
+            println!("Report {report:?} is safe");
+            result += 1;
+        }
+    }
+    return result;
 }
 
 fn main() {
