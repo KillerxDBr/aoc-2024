@@ -49,71 +49,78 @@ fn part2(reports: &Vec<Vec<u64>>) -> u64 {
     let mut result: u64 = 0;
 
     for report in reports {
-        let report_count = report.len();
+        let mut diff: i64;
+        let mut old_diff: i64 = 0;
+        let mut old_diff_used: bool = false;
 
-        let mut safe: bool = true;
-        let mut again: bool = false;
-        let mut new_report = report.clone();
-
-        println!("=================================================");
-        println!("Testing Report: {report:?}");
-        let ord = new_report[0] as i64 - new_report[1] as i64;
-        for i in 1..report_count {
-            // diffs.push(report[i] as i64 - report[i - 1] as i64);
-            let diff: i64 = new_report[i - 1] as i64 - new_report[i] as i64;
-            println!(
-                "abs({} - {}) = {}",
-                new_report[i - 1],
-                new_report[i],
-                diff.abs()
-            );
-            if diff.abs() == 0 || diff.abs() > 3 || (ord < 0 && diff > 0) || (ord > 0 && diff < 0) {
-                println!("ord: {ord}");
-                println!("diff: {diff}");
-                println!("diff.abs() == 0: {}", diff.abs() == 0);
-                println!("diff.abs() > 3: {}", diff.abs() > 3);
-                println!("ord < 0 && diff > 0: {}", (ord < 0 && diff > 0));
-                println!("ord > 0 && diff < 0: {}", (ord > 0 && diff < 0));
-
-                let index_to_remove: usize;
-                if diff.abs() == 0 || ord < 0 {
-                    index_to_remove = i - 1;
-                } else {
-                    index_to_remove = i;
-                }
-                println!(
-                    "Removing report {} ({})",
-                    index_to_remove, new_report[index_to_remove]
-                );
-                new_report.remove(index_to_remove);
-                again = true;
+        let mut report_copy = report.clone();
+        for i in 1..report.len() {
+            diff = report[i] as i64 - report[i - 1] as i64;
+            if diff == 0 && !old_diff_used {
+                report_copy.remove(i - 1);
                 break;
             }
-        }
-
-        if again {
-            println!("Testing Again");
-            let ord = new_report[0] as i64 - new_report[1] as i64;
-            for i in 1..new_report.len() {
-                let diff: i64 = new_report[i - 1] as i64 - new_report[i] as i64;
-                let u_diff = diff.abs() as u64;
-                println!("abs({} - {}) = {u_diff}", new_report[i - 1], new_report[i]);
-                if u_diff == 0 || u_diff > 3 || (ord < 0 && diff > 0) || (ord > 0 && diff < 0) {
-                    println!("diff.abs() == 0: {}", diff.abs() == 0);
-                    println!("diff.abs() > 3: {}", diff.abs() > 3);
-                    println!("ord < 0 && diff > 0: {}", (ord < 0 && diff > 0));
-                    println!("ord > 0 && diff < 0: {}", (ord > 0 && diff < 0));
-                    println!("Report {report:?} is NOT safe");
-                    safe = false;
+            if diff > 3 || diff < -3 {
+                report_copy.remove(i);
+                break;
+            }
+            if old_diff_used {
+                if diff == 0 || (diff > 0 && old_diff < 0) {
+                    report_copy.remove(i - 1);
+                    break;
+                } else if (diff < 0 && old_diff > 0)
+                    || (old_diff > 0 && diff > 3)
+                    || (old_diff < 0 && diff < -3)
+                {
+                    report_copy.remove(i);
                     break;
                 }
             }
+            old_diff = diff;
+            old_diff_used = true;
         }
+
+        let mut safe = true;
+        println!("Report:      {report:?}");
+
+        if report.as_ref() != report_copy {
+            old_diff_used = false;
+            println!("Report Copy: {report_copy:?}");
+
+            for i in 1..report_copy.len() {
+                diff = report_copy[i] as i64 - report_copy[i - 1] as i64;
+                if diff == 0 || diff > 3 || diff < -3 {
+                    safe = false;
+                    break;
+                }
+                if old_diff_used {
+                    if diff > 0 && old_diff < 0 {
+                        safe = false;
+                        break;
+                    } else if diff < 0 && old_diff > 0 {
+                        safe = false;
+                        break;
+                    }
+                }
+                old_diff = diff;
+                old_diff_used = true;
+            }
+        }
+
         if safe {
-            println!("Report {report:?} is safe");
+            println!("Report is Safe");
             result += 1;
+        } else {
+            println!("Report is NOT Safe");
         }
+
+        // println!("Report: {report:?} dir: {}", if dir > 0 {"Ascending"} else {"Descending"});
+        // if dir == 0 {
+        //     println!("Report: {report:?} is invalid");
+        //     continue;
+        // }
     }
+
     return result;
 }
 
