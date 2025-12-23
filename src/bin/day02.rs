@@ -46,15 +46,102 @@ fn part1(reports: &Vec<Vec<u64>>) -> u64 {
 }
 
 fn part2(reports: &Vec<Vec<u64>>) -> u64 {
+    use std::io::{Write, stdout};
+    let mut lock = stdout().lock();
     let mut result: u64 = 0;
 
     for report in reports {
         let mut diff: i64;
-        let mut old_diff: i64 = 0;
-        let mut old_diff_used: bool = false;
+        let mut dir: i64 = 0;
 
+        writeln!(lock, "-----------------------------").unwrap();
+        writeln!(lock, "Report: {report:?}").unwrap();
         let mut report_copy = report.clone();
         for i in 1..report.len() {
+            dir += (report[i] as i64 - report[i - 1] as i64).clamp(-1, 1);
+        }
+        if dir == 0 {
+            writeln!(lock, "Invalid").unwrap();
+            continue;
+        }
+        writeln!(
+            lock,
+            "abs(dir): {}\nreport.len() -1: {}",
+            dir.abs(),
+            report.len() - 1
+        )
+        .unwrap();
+        writeln!(
+            lock,
+            "abs(dir) == report.len() -1: {}",
+            dir.abs() as usize == report.len() - 1
+        )
+        .unwrap();
+        // writellock, n!("{}          {}", dir.abs(), report.len()-1).unwrap();
+        for i in 1..report.len() {
+            diff = report[i] as i64 - report[i - 1] as i64;
+            let index: usize;
+            if diff == 0 || diff < -3 || (diff > 0 && dir < 0) {
+                // i-1
+                index = if i == report.len() - 1 { i } else { i - 1 };
+                writeln!(lock, "Removing {} -> id {}", report_copy[index], index).unwrap();
+                report_copy.remove(index);
+                break;
+            }
+
+            if diff > 3 || (diff < 0 && dir > 0) {
+                // i
+                index = if i - 1 == 0 { 0 } else { i };
+                writeln!(lock, "Removing {} -> id {}", report_copy[index], index).unwrap();
+                report_copy.remove(index);
+                break;
+            }
+
+            // dir = diff;
+        }
+
+        let mut safe: bool = true;
+
+        if report.as_ref() != report_copy {
+            writeln!(lock, "Copy:   {report_copy:?}").unwrap();
+            // dir = 0;
+            for i in 1..report_copy.len() {
+                diff = report_copy[i] as i64 - report_copy[i - 1] as i64;
+                if diff == 0
+                    || diff > 3
+                    || diff < -3
+                    || (dir > 0 && diff < 0)
+                    || (dir < 0 && diff > 0)
+                {
+                    writeln!(lock, "dir:  {dir}").unwrap();
+                    writeln!(
+                        lock,
+                        "diff ({}-{}): {diff}",
+                        report_copy[i],
+                        report_copy[i - 1]
+                    )
+                    .unwrap();
+
+                    writeln!(lock, "diff == 0:           {}", diff == 0).unwrap();
+                    writeln!(lock, "diff > 3:            {}", diff > 3).unwrap();
+                    writeln!(lock, "diff < -3:           {}", diff < -3).unwrap();
+                    writeln!(lock, "dir > 0 && diff < 0: {}", dir > 0 && diff < 0).unwrap();
+                    writeln!(lock, "dir < 0 && diff > 0: {}", dir < 0 && diff > 0).unwrap();
+
+                    safe = false;
+                    break;
+                }
+                // dir = diff;
+            }
+        }
+
+        if safe {
+            writeln!(lock, "Valid").unwrap();
+            result += 1;
+        } else {
+            writeln!(lock, "Invalid").unwrap();
+        }
+        /*for i in 1..report.len() {
             diff = report[i] as i64 - report[i - 1] as i64;
             if diff == 0 && !old_diff_used {
                 report_copy.remove(i - 1);
@@ -94,10 +181,7 @@ fn part2(reports: &Vec<Vec<u64>>) -> u64 {
                     break;
                 }
                 if old_diff_used {
-                    if diff > 0 && old_diff < 0 {
-                        safe = false;
-                        break;
-                    } else if diff < 0 && old_diff > 0 {
+                    if (diff > 0 && old_diff < 0) || (diff < 0 && old_diff > 0) {
                         safe = false;
                         break;
                     }
@@ -119,8 +203,8 @@ fn part2(reports: &Vec<Vec<u64>>) -> u64 {
         //     println!("Report: {report:?} is invalid");
         //     continue;
         // }
+        */
     }
-
     return result;
 }
 
