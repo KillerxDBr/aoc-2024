@@ -1,32 +1,27 @@
 use aoc_2024::utils;
 
+fn part1_valid(report: &Vec<u64>) -> bool {
+    if !report.is_sorted_by(|a, b| a < b) && !report.is_sorted_by(|a, b| a > b) {
+        // println!("Invalid Report: {:?}", report);
+        return false;
+    }
+    for window in report.windows(2) {
+        let diff: u64 = (window[0] as i64 - window[1] as i64).abs() as u64;
 
+        if diff == 0 || diff > 3 {
+            // println!("Invalid Report: {:?}", report);
+            return false;
+        }
+    }
+    return true;
+}
 
 fn part1(reports: &Vec<Vec<u64>>) -> usize {
     let mut result: usize = 0;
 
     for report in reports {
-        let mut safe: bool = true;
-        let mut rc = report.clone();
-        rc.sort();
-        if rc != *report {
-            rc.reverse();
-            if rc != *report {
-                // println!("Invalid Report: {:?}", report);
-                continue;
-            }
-        }
-        for i in 1..report.len() {
-            let diff: u64 = (report[i - 1] as i64 - report[i] as i64).abs() as u64;
-
-            if diff == 0 || diff > 3 {
-                // println!("Invalid Report: {:?}", report);
-                safe = false;
-                break;
-            }
-        }
-        if safe {
-            // println!("Valid Report: {:?}", report);
+        if part1_valid(report) {
+            // println!("Report {report:?} is Valid");
             result += 1;
         }
     }
@@ -34,166 +29,40 @@ fn part1(reports: &Vec<Vec<u64>>) -> usize {
     return result;
 }
 
-fn part2(reports: &Vec<Vec<u64>>) -> u64 {
-    use std::io::{Write, stdout};
-    let mut lock = stdout().lock();
-    let mut result: u64 = 0;
+fn part2(reports: &Vec<Vec<u64>>) -> usize {
+    let mut result: usize = 0;
+    let mut report_copy: Vec<u64> = Vec::new();
 
     for report in reports {
-        let mut diff: i64;
-        let mut dir: i64 = 0;
-
-        writeln!(lock, "-----------------------------").unwrap();
-        writeln!(lock, "Report: {report:?}").unwrap();
-        let mut report_copy = report.clone();
-        for i in 1..report.len() {
-            dir += (report[i] as i64 - report[i - 1] as i64).clamp(-1, 1);
-        }
-        if dir == 0 {
-            writeln!(lock, "Invalid").unwrap();
+        // println!("=======================");
+        // println!("testing report {report:?}");
+        if part1_valid(report) {
+            // println!("report {report:?} is valid");
+            result += 1;
             continue;
         }
-        writeln!(
-            lock,
-            "abs(dir): {}\nreport.len() -1: {}",
-            dir.abs(),
-            report.len() - 1
-        )
-        .unwrap();
-        writeln!(
-            lock,
-            "abs(dir) == report.len() -1: {}",
-            dir.abs() as usize == report.len() - 1
-        )
-        .unwrap();
-        // writellock, n!("{}          {}", dir.abs(), report.len()-1).unwrap();
-        for i in 1..report.len() {
-            diff = report[i] as i64 - report[i - 1] as i64;
-            let index: usize;
-            if diff == 0 || diff < -3 || (diff > 0 && dir < 0) {
-                // i-1
-                index = if i == report.len() - 1 { i } else { i - 1 };
-                writeln!(lock, "Removing {} -> id {}", report_copy[index], index).unwrap();
-                report_copy.remove(index);
-                break;
-            }
 
-            if diff > 3 || (diff < 0 && dir > 0) {
-                // i
-                index = if i - 1 == 0 { 0 } else { i };
-                writeln!(lock, "Removing {} -> id {}", report_copy[index], index).unwrap();
-                report_copy.remove(index);
-                break;
-            }
+        let mut valid = false;
+        for i in 0..report.len() {
+            report_copy.clear();
 
-            // dir = diff;
-        }
-
-        let mut safe: bool = true;
-
-        if report.as_ref() != report_copy {
-            writeln!(lock, "Copy:   {report_copy:?}").unwrap();
-            // dir = 0;
-            for i in 1..report_copy.len() {
-                diff = report_copy[i] as i64 - report_copy[i - 1] as i64;
-                if diff == 0
-                    || diff > 3
-                    || diff < -3
-                    || (dir > 0 && diff < 0)
-                    || (dir < 0 && diff > 0)
-                {
-                    writeln!(lock, "dir:  {dir}").unwrap();
-                    writeln!(
-                        lock,
-                        "diff ({}-{}): {diff}",
-                        report_copy[i],
-                        report_copy[i - 1]
-                    )
-                    .unwrap();
-
-                    writeln!(lock, "diff == 0:           {}", diff == 0).unwrap();
-                    writeln!(lock, "diff > 3:            {}", diff > 3).unwrap();
-                    writeln!(lock, "diff < -3:           {}", diff < -3).unwrap();
-                    writeln!(lock, "dir > 0 && diff < 0: {}", dir > 0 && diff < 0).unwrap();
-                    writeln!(lock, "dir < 0 && diff > 0: {}", dir < 0 && diff > 0).unwrap();
-
-                    safe = false;
-                    break;
+            for j in 0..report.len() {
+                if i != j {
+                    report_copy.push(report[j]);
                 }
-                // dir = diff;
+            }
+            // println!("report copy: {report_copy:?}");
+            if part1_valid(&report_copy) {
+                // println!("report copy {report_copy:?} is valid");
+                valid = true;
+                break;
             }
         }
-
-        if safe {
-            writeln!(lock, "Valid").unwrap();
+        if valid {
             result += 1;
-        } else {
-            writeln!(lock, "Invalid").unwrap();
         }
-        /*for i in 1..report.len() {
-            diff = report[i] as i64 - report[i - 1] as i64;
-            if diff == 0 && !old_diff_used {
-                report_copy.remove(i - 1);
-                break;
-            }
-            if diff > 3 || diff < -3 {
-                report_copy.remove(i);
-                break;
-            }
-            if old_diff_used {
-                if diff == 0 || (diff > 0 && old_diff < 0) {
-                    report_copy.remove(i - 1);
-                    break;
-                } else if (diff < 0 && old_diff > 0)
-                    || (old_diff > 0 && diff > 3)
-                    || (old_diff < 0 && diff < -3)
-                {
-                    report_copy.remove(i);
-                    break;
-                }
-            }
-            old_diff = diff;
-            old_diff_used = true;
-        }
-
-        let mut safe = true;
-        println!("Report:      {report:?}");
-
-        if report.as_ref() != report_copy {
-            old_diff_used = false;
-            println!("Report Copy: {report_copy:?}");
-
-            for i in 1..report_copy.len() {
-                diff = report_copy[i] as i64 - report_copy[i - 1] as i64;
-                if diff == 0 || diff > 3 || diff < -3 {
-                    safe = false;
-                    break;
-                }
-                if old_diff_used {
-                    if (diff > 0 && old_diff < 0) || (diff < 0 && old_diff > 0) {
-                        safe = false;
-                        break;
-                    }
-                }
-                old_diff = diff;
-                old_diff_used = true;
-            }
-        }
-
-        if safe {
-            println!("Report is Safe");
-            result += 1;
-        } else {
-            println!("Report is NOT Safe");
-        }
-
-        // println!("Report: {report:?} dir: {}", if dir > 0 {"Ascending"} else {"Descending"});
-        // if dir == 0 {
-        //     println!("Report: {report:?} is invalid");
-        //     continue;
-        // }
-        */
     }
+
     return result;
 }
 
