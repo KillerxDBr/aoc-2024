@@ -113,6 +113,10 @@ fn search(map: &Vec<&[u8]>, x: usize, y: usize) -> usize {
         }
     }
 
+    //    X
+    //   M
+    //  A
+    // S
     if lf && dw {
         let mut valid = true;
         for i in 0..4 {
