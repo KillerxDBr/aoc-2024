@@ -1,19 +1,7 @@
+use aoc_2024::utils;
+
 use std::cmp::max;
 use std::iter;
-use std::{env, str::FromStr};
-
-fn load_data() -> Result<String, std::io::Error> {
-    let args: Vec<String> = env::args().collect();
-
-    let path: String;
-    if args.len() > 1 {
-        path = args[1].clone();
-    } else {
-        path = String::from_str("input/day01/input.txt").unwrap();
-    }
-
-    return std::fs::read_to_string(path);
-}
 
 fn part1(lhs: &Vec<u64>, rhs: &Vec<u64>) -> u64 {
     let mut lhs_sorted: Vec<u64> = lhs.clone();
@@ -62,7 +50,7 @@ fn part2(lhs: &Vec<u64>, rhs: &Vec<u64>) -> u64 {
 
 fn main() {
     println!("aeHOOOOO");
-    let content = load_data().unwrap();
+    let content = utils::load_data().unwrap();
 
     let mut lhs: Vec<u64> = Vec::new();
     let mut rhs: Vec<u64> = Vec::new();

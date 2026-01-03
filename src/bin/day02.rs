@@ -1,20 +1,9 @@
-use std::{env, str::FromStr};
+use aoc_2024::utils;
 
-fn load_data() -> Result<String, std::io::Error> {
-    let args: Vec<String> = env::args().collect();
 
-    let path: String;
-    if args.len() > 1 {
-        path = args[1].clone();
-    } else {
-        path = String::from_str("input/day02/input.txt").unwrap();
-    }
 
-    return std::fs::read_to_string(path);
-}
-
-fn part1(reports: &Vec<Vec<u64>>) -> u64 {
-    let mut result: u64 = 0;
+fn part1(reports: &Vec<Vec<u64>>) -> usize {
+    let mut result: usize = 0;
 
     for report in reports {
         let mut safe: bool = true;
@@ -209,7 +198,7 @@ fn part2(reports: &Vec<Vec<u64>>) -> u64 {
 }
 
 fn main() {
-    let content = load_data().unwrap();
+    let content = utils::load_data().unwrap();
     let lines: Vec<&str> = content.lines().collect();
 
     let mut reports: Vec<Vec<u64>> = Vec::with_capacity(lines.len());
