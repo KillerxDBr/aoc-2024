@@ -13,7 +13,7 @@ pub mod utils {
             path = format!("input/{exe}/input.txt");
         }
 
-        println!("Loading content of \"{path}\"");
+        println!("[INFO] Loading content of \"{path}\"");
         return std::fs::read_to_string(path);
     }
 }
