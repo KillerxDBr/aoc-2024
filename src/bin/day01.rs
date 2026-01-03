@@ -49,7 +49,6 @@ fn part2(lhs: &Vec<u64>, rhs: &Vec<u64>) -> u64 {
 }
 
 fn main() {
-    println!("aeHOOOOO");
     let content = utils::load_data().unwrap();
 
     let mut lhs: Vec<u64> = Vec::new();
