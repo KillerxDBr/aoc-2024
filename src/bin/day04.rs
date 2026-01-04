@@ -1,7 +1,7 @@
 use aoc_2024::utils;
 use std::{cmp::Ordering, process::exit};
 
-fn search(map: &Vec<&[u8]>, x: usize, y: usize) -> usize {
+fn search1(map: &Vec<&[u8]>, x: usize, y: usize) -> usize {
     let mut result: usize = 0;
     let word = [b'X', b'M', b'A', b'S'];
 
@@ -132,9 +132,33 @@ fn search(map: &Vec<&[u8]>, x: usize, y: usize) -> usize {
     return result;
 }
 
-fn part1(content: &String) -> usize {
-    // use std::io::{Write, stdout};
+fn search2(map: &Vec<&[u8]>, x: usize, y: usize) -> bool {
+    let check_char = |c: u8| -> bool { return c == b'M' || c == b'S' };
 
+    if y == 0 || y == map.len() - 1 {
+        return false;
+    }
+    if x == 0 || x == map[y].len() - 1 {
+        return false;
+    }
+
+    let tl = map[y - 1][x - 1];
+    let tr = map[y - 1][x + 1];
+    let bl = map[y + 1][x - 1];
+    let br = map[y + 1][x + 1];
+
+    if !check_char(tl) || !check_char(tr) || !check_char(bl) || !check_char(br) {
+        return false;
+    }
+
+    if tl == br || tr == bl {
+        return false;
+    }
+
+    return true;
+}
+
+fn part1(content: &String) -> usize {
     let mut result: usize = 0;
 
     let mut map: Vec<&[u8]> = Vec::new();
@@ -142,28 +166,31 @@ fn part1(content: &String) -> usize {
         map.push(l.as_bytes());
     }
 
-    // let mut i: usize = 0;
-
-    // let mut lock = stdout().lock();
-    // for l in map {
-    //     for c in l.chars() {
-    //         write!(lock, "{c}").unwrap();
-    //     }
-    //     write!(lock, "\n").unwrap();
-    // }
-    // for a in map {
-    //     for b in a {
-    //         if b == 'X' {
-    //             println!("X found in {x}, {y}");
-    //         }
-    //     }
-    // }
     for y in 0..map.len() {
         for x in 0..map[y].len() {
-            // println!("({x}, {y}) = '{}'", map[y][x] as char);
             if map[y][x] == b'X' {
-                // println!("X found in {x}, {y}");
-                result += search(&map, x, y);
+                result += search1(&map, x, y);
+            }
+        }
+    }
+
+    return result;
+}
+
+fn part2(content: &String) -> usize {
+    let mut result: usize = 0;
+
+    let mut map: Vec<&[u8]> = Vec::new();
+    for l in content.lines() {
+        map.push(l.as_bytes());
+    }
+
+    for y in 0..map.len() {
+        for x in 0..map[y].len() {
+            if map[y][x] == b'A' {
+                if search2(&map, x, y) {
+                    result += 1;
+                }
             }
         }
     }
@@ -178,5 +205,5 @@ fn main() {
     });
     // println!("{content}");
     println!("Resultado Parte 1: {}", part1(&content));
-    // println!("Resultado Parte 2: {}", part2(&content));
+    println!("Resultado Parte 2: {}", part2(&content));
 }
