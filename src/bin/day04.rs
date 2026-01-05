@@ -201,7 +201,7 @@ fn part2(content: &String) -> usize {
 fn main() {
     let content = utils::load_data().unwrap_or_else(|err| {
         eprintln!("[ERROR] Could not open input file: {}", err);
-        exit(err.raw_os_error().unwrap());
+        exit(1);
     });
     // println!("{content}");
     println!("Resultado Parte 1: {}", part1(&content));

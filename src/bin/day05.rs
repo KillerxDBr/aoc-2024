@@ -78,7 +78,7 @@ fn part2(rules: &HashMap<usize, Vec<usize>>, orders: &Vec<Vec<usize>>) -> usize 
 fn main() {
     let content = utils::load_data().unwrap_or_else(|err| {
         eprintln!("[ERROR] Could not open input file: {}", err);
-        exit(err.raw_os_error().unwrap());
+        exit(1);
     });
 
     let (rules, orders) = parse_data(&content);
