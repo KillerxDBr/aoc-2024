@@ -1,5 +1,6 @@
 use aoc_2024::utils;
 use regex::Regex;
+use std::process::exit;
 
 fn part1(content: &String) -> u64 {
     let mut result = 0;
@@ -68,7 +69,10 @@ fn part2(content: &String) -> u64 {
 }
 
 fn main() {
-    let content = utils::load_data().unwrap();
+    let content = utils::load_data().unwrap_or_else(|err| {
+        eprintln!("[ERROR] Could not open input file: {}", err);
+        exit(1);
+    });
     println!("Resultado Parte 1: {}", part1(&content));
     println!("Resultado Parte 2: {}", part2(&content));
 }

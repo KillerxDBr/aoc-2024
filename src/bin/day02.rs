@@ -1,4 +1,5 @@
 use aoc_2024::utils;
+use std::process::exit;
 
 fn part1_valid(report: &Vec<u64>) -> bool {
     if !report.is_sorted_by(|a, b| a < b) && !report.is_sorted_by(|a, b| a > b) {
@@ -67,7 +68,10 @@ fn part2(reports: &Vec<Vec<u64>>) -> usize {
 }
 
 fn main() {
-    let content = utils::load_data().unwrap();
+    let content = utils::load_data().unwrap_or_else(|err| {
+        eprintln!("[ERROR] Could not open input file: {}", err);
+        exit(1);
+    });
     let lines: Vec<&str> = content.lines().collect();
 
     let mut reports: Vec<Vec<u64>> = Vec::with_capacity(lines.len());

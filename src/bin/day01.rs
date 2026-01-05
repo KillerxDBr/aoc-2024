@@ -2,6 +2,7 @@ use aoc_2024::utils;
 
 use std::cmp::max;
 use std::iter;
+use std::process::exit;
 
 fn part1(lhs: &Vec<u64>, rhs: &Vec<u64>) -> u64 {
     let mut lhs_sorted: Vec<u64> = lhs.clone();
@@ -49,7 +50,10 @@ fn part2(lhs: &Vec<u64>, rhs: &Vec<u64>) -> u64 {
 }
 
 fn main() {
-    let content = utils::load_data().unwrap();
+    let content = utils::load_data().unwrap_or_else(|err| {
+        eprintln!("[ERROR] Could not open input file: {}", err);
+        exit(1);
+    });
 
     let mut lhs: Vec<u64> = Vec::new();
     let mut rhs: Vec<u64> = Vec::new();
