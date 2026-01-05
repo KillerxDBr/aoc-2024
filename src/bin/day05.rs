@@ -35,24 +35,26 @@ fn parse_data(content: &String) -> (HashMap<usize, Vec<usize>>, Vec<Vec<usize>>)
     return (rules, orders);
 }
 
+fn check_order(rules: &HashMap<usize, Vec<usize>>, order: &Vec<usize>) -> bool {
+    for i in 1..order.len() {
+        let k = &order[i];
+        let slice = &order[..i];
+        if let Some(r) = rules.get(k) {
+            for n in r {
+                if slice.contains(n) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
 fn part1(rules: &HashMap<usize, Vec<usize>>, orders: &Vec<Vec<usize>>) -> usize {
     let mut result: usize = 0;
 
     for order in orders {
-        let mut valid = true;
-        'order_iter: for i in 1..order.len() {
-            let k = &order[i];
-            let slice = &order[..i];
-            if let Some(r) = rules.get(k) {
-                for n in r {
-                    if slice.contains(n) {
-                        valid = false;
-                        break 'order_iter;
-                    }
-                }
-            }
-        }
-        if valid {
+        if check_order(rules, order) {
             println!("Order {order:?} is valid");
             result += order[order.len() / 2];
         }
@@ -61,13 +63,17 @@ fn part1(rules: &HashMap<usize, Vec<usize>>, orders: &Vec<Vec<usize>>) -> usize 
     return result;
 }
 
-// fn part2(rules: &HashMap<usize, Vec<usize>>, order: &Vec<Vec<usize>>) -> usize {
-//     let result: usize = 0;
+fn part2(rules: &HashMap<usize, Vec<usize>>, orders: &Vec<Vec<usize>>) -> usize {
+    let result: usize = 0;
 
-//     // println!("{}", content);
+        for order in orders {
+        if !check_order(rules, order) {
+            todo!("Fix incorrect ordered pages");
+        }
+    }
 
-//     return result;
-// }
+    return result;
+}
 
 fn main() {
     let content = utils::load_data().unwrap_or_else(|err| {
@@ -87,5 +93,5 @@ fn main() {
     }
 
     println!("Resultado Parte 1: {}", part1(&rules, &orders));
-    // println!("Resultado Parte 2: {}", part2(&rules, &orders));
+    println!("Resultado Parte 2: {}", part2(&rules, &orders));
 }
