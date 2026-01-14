@@ -35,7 +35,7 @@ fn parse_data(content: &String) -> (HashMap<usize, Vec<usize>>, Vec<Vec<usize>>)
     return (rules, orders);
 }
 
-fn check_order(rules: &HashMap<usize, Vec<usize>>, order: &Vec<usize>) -> bool {
+fn check_order(rules: &HashMap<usize, Vec<usize>>, order: &[usize]) -> bool {
     for i in 1..order.len() {
         let k = &order[i];
         let slice = &order[..i];
@@ -50,29 +50,54 @@ fn check_order(rules: &HashMap<usize, Vec<usize>>, order: &Vec<usize>) -> bool {
     return true;
 }
 
-fn part1(rules: &HashMap<usize, Vec<usize>>, orders: &Vec<Vec<usize>>) -> usize {
-    let mut result: usize = 0;
+fn reorder(rules: &HashMap<usize, Vec<usize>>, order: &[usize]) -> usize {
+    let mut reorderer = order.to_vec();
+
+    let mut index: usize = 1;
+    while index < reorderer.len() {
+        let k = reorderer[index];
+        let slice = &reorderer[..index];
+
+        if let Some(r) = rules.get(&k) {
+            for n in r {
+                if slice.contains(n) {
+                    let j: usize = slice.iter().position(|&x| x == *n).unwrap();
+
+                    println!("========================");
+                    println!("antes:  {:?}", reorderer);
+                    reorderer.swap(index, j);
+                    println!("depois: {:?}", reorderer);
+
+                    break;
+                }
+            }
+        }
+
+        let t = reorderer[..=index].to_vec();
+        println!("Testing {:?}", &t);
+        if check_order(rules, &t) {
+            index += 1;
+        }
+    }
+
+    return reorderer[reorderer.len() / 2];
+}
+
+fn process(rules: &HashMap<usize, Vec<usize>>, orders: &Vec<Vec<usize>>) -> (usize, usize) {
+    let mut result1: usize = 0;
+    let mut result2: usize = 0;
 
     for order in orders {
         if check_order(rules, order) {
             println!("Order {order:?} is valid");
-            result += order[order.len() / 2];
+            result1 += order[order.len() / 2];
+        // } else {
+        //     println!("Order {order:?} is invalid, reordering...");
+        //     result2 += reorder(rules, order);
         }
     }
 
-    return result;
-}
-
-fn part2(rules: &HashMap<usize, Vec<usize>>, orders: &Vec<Vec<usize>>) -> usize {
-    let result: usize = 0;
-
-        for order in orders {
-        if !check_order(rules, order) {
-            todo!("Fix incorrect ordered pages");
-        }
-    }
-
-    return result;
+    return (result1, result2);
 }
 
 fn main() {
@@ -92,6 +117,8 @@ fn main() {
         println!("  {o:?}");
     }
 
-    println!("Resultado Parte 1: {}", part1(&rules, &orders));
-    println!("Resultado Parte 2: {}", part2(&rules, &orders));
+    let (result1, result2) = process(&rules, &orders);
+
+    println!("Resultado Parte 1: {}", result1);
+    println!("Resultado Parte 2: {}", result2);
 }
