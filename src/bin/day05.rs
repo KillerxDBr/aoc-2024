@@ -53,33 +53,50 @@ fn check_order(rules: &HashMap<usize, Vec<usize>>, order: &[usize]) -> bool {
 fn reorder(rules: &HashMap<usize, Vec<usize>>, order: &[usize]) -> usize {
     let mut reorderer = order.to_vec();
 
-    let mut index: usize = 1;
-    while index < reorderer.len() {
+    let mut index: usize = reorderer.len() - 1;
+    while index > 0 {
+        // let mut recheck = false;
         let k = reorderer[index];
         let slice = &reorderer[..index];
 
         if let Some(r) = rules.get(&k) {
+            println!("========================");
+            println!("entry: {}\nrules: {:?}", &k, &r);
             for n in r {
                 if slice.contains(n) {
                     let j: usize = slice.iter().position(|&x| x == *n).unwrap();
 
                     println!("========================");
+                    if order[index] == order[j] {
+                        continue;
+                    }
+                    println!("j {j}\nindex {index}");
                     println!("antes:  {:?}", reorderer);
+                    assert_ne!(index, j);
                     reorderer.swap(index, j);
                     println!("depois: {:?}", reorderer);
 
+                    // recheck = true;
                     break;
                 }
             }
         }
 
         let t = reorderer[..=index].to_vec();
-        println!("Testing {:?}", &t);
-        if check_order(rules, &t) {
-            index += 1;
+        // println!("========================");
+        println!("original  {:?}", &order);
+        println!("reorderer {:?}", &reorderer);
+        println!("testing   {:?}", &t);
+        if !check_order(rules, &t) {
+            index -= 1;
+        } else {
+            break;
         }
     }
 
+    assert_eq!(reorderer.len() % 2, 1);
+
+    println!("Order {:?} is now valid...", &reorderer);
     return reorderer[reorderer.len() / 2];
 }
 
@@ -91,9 +108,9 @@ fn process(rules: &HashMap<usize, Vec<usize>>, orders: &Vec<Vec<usize>>) -> (usi
         if check_order(rules, order) {
             println!("Order {order:?} is valid");
             result1 += order[order.len() / 2];
-        // } else {
-        //     println!("Order {order:?} is invalid, reordering...");
-        //     result2 += reorder(rules, order);
+        } else {
+            println!("Order {order:?} is invalid, reordering...");
+            result2 += reorder(rules, order);
         }
     }
 
